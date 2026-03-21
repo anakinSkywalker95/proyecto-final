@@ -1,0 +1,36 @@
+# Control de versiones
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Entornos virtuales
+venv/
+.venv/
+
+# Tests (no van a producción)
+tests/
+pytest.ini
+
+# Documentación
+README.md
+*.md
+
+# Variables de entorno locales
+.env
+.env.local
+.env.example
+
+# IDEs
+.vscode/
+.idea/
+
+# GitHub Actions
+.github/

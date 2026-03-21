@@ -333,6 +333,7 @@ Merge a main → Checkout → Docker Buildx
 |---------------------|----------------------------------|
 | Josué Erazo         | Desarrollo y DevOps              |
 | Diana Chacon        | Apoyo en el desarrollo de la API |
+| Jose Nahum Reyes    | Apoyo en docker file             |
 | Grupo #3            | Sistemas Operativos              |
 
 ---

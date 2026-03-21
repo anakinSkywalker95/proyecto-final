@@ -1,4 +1,4 @@
-# Tareas API - Proyecto CI/CD Universitario
+# Tareas API - Proyecto Final CI/CD Grupo #3 Sistemas Operativos
 
 [![CI - Lint y Tests](https://github.com/anakinSkywalker95/proyecto-final/actions/workflows/ci.yml/badge.svg)](https://github.com/anakinSkywalker95/proyecto-final/actions/workflows/ci.yml)
 [![CD - Docker Hub](https://github.com/anakinSkywalker95/proyecto-final/actions/workflows/cd.yml/badge.svg)](https://github.com/anakinSkywalker95/proyecto-final/actions/workflows/cd.yml)
@@ -331,10 +331,7 @@ Merge a main → Checkout → Docker Buildx
 
 | Nombre              | Rol                    |
 |---------------------|------------------------|
-| Equipo Universitario | Desarrollo y DevOps   |
+| Josué Erazo         | Desarrollo y DevOps    |
+| Grupo #3            | Sistemas Operativos    |
 
 ---
-
-## Licencia
-
-Este proyecto es de uso academico y educativo.

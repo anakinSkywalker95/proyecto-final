@@ -332,7 +332,7 @@ Merge a main → Checkout → Docker Buildx
 | Nombre              | Rol                              |
 |---------------------|----------------------------------|
 | Josué Erazo         | Desarrollo y DevOps              |
-| Diana Chacon        | Aoyo en el desarrollo de la API  |
+| Diana Chacon        | Apoyo en el desarrollo de la API |
 | Grupo #3            | Sistemas Operativos              |
 
 ---

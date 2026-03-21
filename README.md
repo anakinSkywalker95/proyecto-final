@@ -329,9 +329,10 @@ Merge a main → Checkout → Docker Buildx
 
 ## Autores
 
-| Nombre              | Rol                    |
-|---------------------|------------------------|
-| Josué Erazo         | Desarrollo y DevOps    |
-| Grupo #3            | Sistemas Operativos    |
+| Nombre              | Rol                              |
+|---------------------|----------------------------------|
+| Josué Erazo         | Desarrollo y DevOps              |
+| Diana Chacon        | Aoyo en el desarrollo de la API  |
+| Grupo #3            | Sistemas Operativos              |
 
 ---

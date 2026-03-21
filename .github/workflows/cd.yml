@@ -1,0 +1,69 @@
+name: CD - Build y Push Docker Hub
+
+on:
+  push:
+    branches:
+      - main      # Deploy automático al hacer merge a main
+    tags:
+      - "v*.*.*"  # También en tags de versión (v1.0.0, v2.3.1, etc.)
+
+jobs:
+  build-and-push:
+    name: Build y Push a Docker Hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      # Extrae metadatos para etiquetar la imagen automáticamente
+      - name: Extraer metadatos Docker (tags y labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/tareas-api
+          tags: |
+            # Tag 'latest' en cada push a main
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Tag con número de commit corto (ej: sha-a1b2c3d)
+            type=sha,prefix=sha-,format=short
+            # Tags de versión semántica en tags (v1.2.3 → 1.2.3, 1.2, 1)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      # Configura QEMU para builds multi-arquitectura (amd64 + arm64)
+      - name: Configurar QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Buildx permite builds multi-plataforma y caché avanzada
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build y Push de la imagen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          target: production
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Cache desde/hacia Docker Hub para builds más rápidos
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/tareas-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/tareas-api:buildcache,mode=max
+
+      - name: Resumen del deploy
+        run: |
+          echo "## Deploy completado" >> $GITHUB_STEP_SUMMARY
+          echo "**Imagen:** \`${{ secrets.DOCKER_USERNAME }}/tareas-api\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags publicados:**" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Plataformas:** linux/amd64, linux/arm64" >> $GITHUB_STEP_SUMMARY

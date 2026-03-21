@@ -1,0 +1,20 @@
+[MASTER]
+# Archivos y carpetas a ignorar
+ignore=tests,migrations
+ignore-patterns=test_.*\.py
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    too-few-public-methods,
+    import-error
+
+[FORMAT]
+max-line-length=100
+
+[DESIGN]
+max-args=8
+max-attributes=10
+
+[SIMILARITIES]
+min-similarity-lines=10

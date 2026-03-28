@@ -26,8 +26,13 @@ def validar_prioridad(prioridad: str):
 @tareas_bp.get("/health")
 def health_check():
     """
-    GET /api/health
-    Verifica que la aplicación y la base de datos estén en línea.
+    Verifica el estado de la aplicación
+    ---
+    tags:
+      - Health
+    responses:
+      200:
+        description: App y base de datos funcionando correctamente
     """
     try:
         db.session.execute(db.text("SELECT 1"))
@@ -39,10 +44,22 @@ def health_check():
 @tareas_bp.get("/tareas")
 def listar_tareas():
     """
-    GET /api/tareas
-    Retorna todas las tareas. Soporta filtros opcionales por query string:
-      - completada=true|false
-      - prioridad=baja|media|alta
+    Lista todas las tareas
+    ---
+    tags:
+      - Tareas
+    parameters:
+      - name: completada
+        in: query
+        type: boolean
+        description: Filtrar por estado (true/false)
+      - name: prioridad
+        in: query
+        type: string
+        description: Filtrar por prioridad (baja/media/alta)
+    responses:
+      200:
+        description: Lista de tareas obtenida correctamente
     """
     query = Tarea.query
 
@@ -62,8 +79,21 @@ def listar_tareas():
 @tareas_bp.get("/tareas/<int:tarea_id>")
 def obtener_tarea(tarea_id: int):
     """
-    GET /api/tareas/<id>
-    Retorna una tarea por su ID.
+    Obtiene una tarea por su ID
+    ---
+    tags:
+      - Tareas
+    parameters:
+      - name: tarea_id
+        in: path
+        type: integer
+        required: true
+        description: ID de la tarea
+    responses:
+      200:
+        description: Tarea encontrada
+      404:
+        description: Tarea no encontrada
     """
     tarea = db.session.get(Tarea, tarea_id)
     if not tarea:
@@ -74,9 +104,33 @@ def obtener_tarea(tarea_id: int):
 @tareas_bp.post("/tareas")
 def crear_tarea():
     """
-    POST /api/tareas
-    Crea una nueva tarea. Body JSON requerido:
-      { "titulo": str, "descripcion": str (opcional), "prioridad": str (opcional) }
+    Crea una nueva tarea
+    ---
+    tags:
+      - Tareas
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - titulo
+          properties:
+            titulo:
+              type: string
+              example: Mi nueva tarea
+            descripcion:
+              type: string
+              example: Descripción de la tarea
+            prioridad:
+              type: string
+              example: alta
+    responses:
+      201:
+        description: Tarea creada correctamente
+      400:
+        description: Datos inválidos
     """
     datos = request.get_json(silent=True)
     if not datos:
@@ -104,9 +158,36 @@ def crear_tarea():
 @tareas_bp.put("/tareas/<int:tarea_id>")
 def actualizar_tarea(tarea_id: int):
     """
-    PUT /api/tareas/<id>
-    Actualiza uno o más campos de una tarea existente. Body JSON:
-      { "titulo": str, "descripcion": str, "completada": bool, "prioridad": str }
+    Actualiza una tarea existente
+    ---
+    tags:
+      - Tareas
+    parameters:
+      - name: tarea_id
+        in: path
+        type: integer
+        required: true
+        description: ID de la tarea
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            titulo:
+              type: string
+            descripcion:
+              type: string
+            completada:
+              type: boolean
+            prioridad:
+              type: string
+    responses:
+      200:
+        description: Tarea actualizada correctamente
+      404:
+        description: Tarea no encontrada
+      400:
+        description: Datos inválidos
     """
     tarea = db.session.get(Tarea, tarea_id)
     if not tarea:
@@ -144,8 +225,21 @@ def actualizar_tarea(tarea_id: int):
 @tareas_bp.delete("/tareas/<int:tarea_id>")
 def eliminar_tarea(tarea_id: int):
     """
-    DELETE /api/tareas/<id>
-    Elimina una tarea por su ID.
+    Elimina una tarea por su ID
+    ---
+    tags:
+      - Tareas
+    parameters:
+      - name: tarea_id
+        in: path
+        type: integer
+        required: true
+        description: ID de la tarea a eliminar
+    responses:
+      200:
+        description: Tarea eliminada correctamente
+      404:
+        description: Tarea no encontrada
     """
     tarea = db.session.get(Tarea, tarea_id)
     if not tarea:

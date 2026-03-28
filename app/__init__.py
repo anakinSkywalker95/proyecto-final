@@ -25,11 +25,18 @@ def create_app(config_name: str = None):
     app.config.from_object(cfg_class())
 
     db.init_app(app)
-
+    from flasgger import Swagger
     from app.routes import tareas_bp  # pylint: disable=import-outside-toplevel
     from app.errors import register_error_handlers  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(tareas_bp)
+    Swagger(app, template={
+    "info": {
+        "title": "Proyecto Final CI/CD - Grupo #3",
+        "description": "API REST para gestión de tareas",
+        "version": "1.0.0"
+    }
+})
     register_error_handlers(app)
 
     with app.app_context():

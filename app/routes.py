@@ -1,5 +1,6 @@
 """Rutas y endpoints CRUD para la entidad Tarea."""
-from flask import Blueprint, jsonify, request
+import os
+from flask import Blueprint, jsonify, request, send_from_directory
 from app import db
 from app.models import Tarea
 
@@ -19,6 +20,15 @@ def validar_prioridad(prioridad: str):
         validas = ", ".join(sorted(Tarea.PRIORIDADES_VALIDAS))
         return False, f"Prioridad inválida. Valores permitidos: {validas}"
     return True, None
+
+
+# ── Interfaz Grafica ──────────────────────────────────────────────────────────
+
+@tareas_bp.get("/ui")
+def index():
+    """Sirve la interfaz gráfica."""
+    static_dir = os.path.join(os.path.dirname(__file__), "static")
+    return send_from_directory(static_dir, "index.html")
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────

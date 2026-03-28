@@ -11,6 +11,16 @@ API REST para gestión de tareas, construida con **Flask + PostgreSQL**, empaque
 
 ---
 
+## URL Publica de Produccion
+
+| Recurso | URL |
+|---------|-----|
+| API Health | https://proyecto-final-i2o4.onrender.com/api/health |
+| Swagger UI | https://proyecto-final-i2o4.onrender.com/apidocs |
+| Repositorio | https://github.com/anakinSkywalker95/proyecto-final |
+
+---
+
 ## Descripcion del Proyecto
 
 Este proyecto demuestra la implementación de un pipeline DevOps completo para una aplicación web universitaria:
@@ -20,6 +30,7 @@ Este proyecto demuestra la implementación de un pipeline DevOps completo para u
 - **Contenedores**: Dockerfile multi-stage optimizado + docker-compose
 - **CI**: Lint automático con Pylint y tests con Pytest (cobertura >= 70%)
 - **CD**: Build y push automático a Docker Hub al hacer merge a `main`
+- **Documentacion**: Swagger UI interactivo con Flasgger
 
 ---
 
@@ -54,15 +65,14 @@ Este proyecto demuestra la implementación de un pipeline DevOps completo para u
 +------------------------------------------+
 |            DOCKER HUB                    |
 |                                          |
-|  usuario/tareas-api:latest               |
-|  usuario/tareas-api:sha-a1b2c3d          |
-|  usuario/tareas-api:1.0.0 (en tags)      |
+|  josueerazo95/tareas-api:latest          |
+|  josueerazo95/tareas-api:sha-a1b2c3d     |
 +------------------------------------------+
                     |
                     | docker pull / docker-compose up
                     v
 +----------------------------------------------------------+
-|                  ENTORNO DE PRODUCCION                   |
+|                  ENTORNO DE PRODUCCION (Render)          |
 |                                                          |
 |  +-------------------+    +---------------------------+  |
 |  |  tareas_app       |    |  tareas_postgres          |  |
@@ -111,6 +121,7 @@ FLASK_ENV=development python wsgi.py
 ```
 
 La API estara disponible en `http://localhost:5000`.
+La documentacion Swagger en `http://localhost:5000/apidocs`.
 
 ---
 
@@ -143,17 +154,25 @@ docker compose down
 docker compose down -v
 ```
 
-La API estara disponible en `http://localhost:5000`.
+La API estara disponible en `http://localhost:5001`.
+La documentacion Swagger en `http://localhost:5001/apidocs`.
 
-### Usar la imagen publicada en Docker Hub
+---
 
-```bash
-# Sin docker-compose, solo la app (necesita PostgreSQL externo)
-docker run -d \
-  -p 5000:5000 \
-  -e DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/tareas_db" \
-  anakinSkywalker95/tareas-api:latest
-```
+## Documentacion Swagger
+
+Este proyecto incluye documentacion interactiva con **Swagger UI** powered by Flasgger.
+
+| Entorno | URL |
+|---------|-----|
+| Local | http://localhost:5001/apidocs |
+| Produccion | https://proyecto-final-i2o4.onrender.com/apidocs |
+
+Desde Swagger UI puedes:
+- Ver todos los endpoints documentados
+- Probar cada endpoint directamente desde el navegador
+- Ver los parametros requeridos y opcionales
+- Ver los codigos de respuesta posibles
 
 ---
 
@@ -181,7 +200,8 @@ pytest tests/test_tasks.py::TestCrearTarea::test_crear_tarea_exitosamente -v
 
 ## Endpoints de la API
 
-Base URL: `http://localhost:5000/api`
+Base URL local: `http://localhost:5001/api`
+Base URL produccion: `https://proyecto-final-i2o4.onrender.com/api`
 
 ### Resumen
 
@@ -198,53 +218,44 @@ Base URL: `http://localhost:5000/api`
 
 #### Health Check
 ```bash
-curl http://localhost:5000/api/health
+curl http://localhost:5001/api/health
 # {"base_de_datos": "conectada", "status": "ok"}
 ```
 
 #### Crear una tarea
 ```bash
-curl -X POST http://localhost:5000/api/tareas \
+curl -X POST http://localhost:5001/api/tareas \
   -H "Content-Type: application/json" \
   -d '{"titulo": "Estudiar Docker", "descripcion": "Ver tutorial de Compose", "prioridad": "alta"}'
-# {
-#   "id": 1,
-#   "titulo": "Estudiar Docker",
-#   "descripcion": "Ver tutorial de Compose",
-#   "completada": false,
-#   "prioridad": "alta",
-#   "creada_en": "2026-03-20T10:00:00",
-#   "actualizada_en": "2026-03-20T10:00:00"
-# }
 ```
 
 #### Listar todas las tareas
 ```bash
-curl http://localhost:5000/api/tareas
+curl http://localhost:5001/api/tareas
 # {"tareas": [...], "total": 1}
 ```
 
 #### Filtrar por prioridad
 ```bash
-curl "http://localhost:5000/api/tareas?prioridad=alta"
-curl "http://localhost:5000/api/tareas?completada=false"
+curl "http://localhost:5001/api/tareas?prioridad=alta"
+curl "http://localhost:5001/api/tareas?completada=false"
 ```
 
 #### Obtener una tarea por ID
 ```bash
-curl http://localhost:5000/api/tareas/1
+curl http://localhost:5001/api/tareas/1
 ```
 
 #### Actualizar una tarea
 ```bash
-curl -X PUT http://localhost:5000/api/tareas/1 \
+curl -X PUT http://localhost:5001/api/tareas/1 \
   -H "Content-Type: application/json" \
   -d '{"completada": true, "prioridad": "baja"}'
 ```
 
 #### Eliminar una tarea
 ```bash
-curl -X DELETE http://localhost:5000/api/tareas/1
+curl -X DELETE http://localhost:5001/api/tareas/1
 # {"mensaje": "Tarea 1 eliminada correctamente"}
 ```
 
@@ -255,14 +266,15 @@ curl -X DELETE http://localhost:5000/api/tareas/1
 ```
 proyecto-final/
 ├── app/
-│   ├── __init__.py        # Application Factory (create_app)
+│   ├── __init__.py        # Application Factory (create_app) + Swagger
 │   ├── config.py          # Configuraciones por entorno
 │   ├── models.py          # Modelo Tarea con SQLAlchemy
-│   └── routes.py          # Endpoints CRUD de la API
+│   ├── routes.py          # Endpoints CRUD con documentacion Swagger
+│   └── errors.py          # Handlers de errores HTTP
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py        # Fixtures de Pytest (app, client, BD)
-│   └── test_tasks.py      # 24 tests organizados en 7 clases
+│   └── test_tasks.py      # 25 tests organizados en 7 clases
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml         # Pipeline: Pylint + Pytest + Cobertura
@@ -283,7 +295,7 @@ proyecto-final/
 | Variable          | Descripcion                        | Default                     |
 |-------------------|------------------------------------|------------------------------|
 | FLASK_ENV         | Entorno (development/production)   | development                  |
-| SECRET_KEY        | Clave secreta de Flask             | dev-secret-key-insegura      |
+| SECRET_KEY        | Clave secreta de Flask             | dev-secret-key-2024          |
 | DATABASE_URL      | URL completa de PostgreSQL         | postgresql://...localhost/.. |
 | POSTGRES_USER     | Usuario de PostgreSQL              | postgres                     |
 | POSTGRES_PASSWORD | Contrasena de PostgreSQL           | postgres                     |
